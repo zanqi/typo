@@ -1,3 +1,9 @@
 <% @page_heading = _('New article') %>
 
 <%= render "admin/shared/edit", { :form_type => "article", :form_action => { :action => "new", :id => @article.id , :class => ('autosave')} } %>
+
+<% if current_user.admin? %>
+  <%= form_tag('/merge') do %>
+    <h4><%= _("Merge Articles") %></h4>
+  <% end %>
+<% end %>
