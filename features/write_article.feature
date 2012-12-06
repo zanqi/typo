@@ -8,10 +8,7 @@ Feature: Write Articles
     And I am logged in as "admin"
 
   Scenario: Successfully write articles
-    Given I am on the new article page
-    When I fill in "article_title" with "Foobar"
-    And I fill in "article__body_and_extended_editor" with "Lorem Ipsum"
-    And I press "Publish"
+    Given I've published an article "Foobar" with body "Lorem Ipsum"
     Then I should be on the admin content page
     When I go to the home page
     Then I should see "Foobar"

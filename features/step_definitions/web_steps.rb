@@ -61,12 +61,18 @@ Given /^I am logged in as "(.*?)"$/ do |user|
   end
 end
 
-Given /^I am editing an existing article$/ do
+Given /^I've published an article "([^"]*)" with body "([^"]*)"$/ do |title, body|
   steps %Q{
     Given I am on the new article page
-    When I fill in "article_title" with "Foobar"
-    And I fill in "article__body_and_extended_editor" with "Lorem Ipsum"
+    When I fill in "article_title" with "#{title}"
+    And I fill in "article__body_and_extended_editor" with "#{body}"
     And I press "Publish"
+  }
+end
+
+Given /^I am editing an existing article$/ do
+  steps %Q{
+    Given I've published an article "Foobar" with body "Lorem Ipsum"
     And I follow "Foobar"
   }
 end
