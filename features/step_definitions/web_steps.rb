@@ -50,6 +50,8 @@ Given /^the blog is set up$/ do
 end
 
 Given /^I am logged in as "(.*?)"$/ do |user|
+  visit '/admin'
+  visit '/accounts/logout' if page.has_content? 'Log out'
   visit '/accounts/login'
   fill_in 'user_login', :with => user
   fill_in 'user_password', :with => 'aaaaaaaa'
@@ -68,6 +70,23 @@ Given /^I've published an article "([^"]*)" with body "([^"]*)"$/ do |title, bod
     And I fill in "article__body_and_extended_editor" with "#{body}"
     And I press "Publish"
   }
+end
+
+Given /^I am looking at article "([^"]*)"$/ do |article|
+  steps %Q{
+    When I go to the home page
+    Then I should see "#{article}"
+    When I follow "#{article}"
+  }
+end
+
+Given /^I've posted a comment "([^"]*)" on article "([^"]*)"$/ do |comment, article|
+  steps %Q{
+    When I am looking at article "#{article}"
+  }
+  fill_in 'comment_author', :with => 'Reader'
+  fill_in 'comment_body', :with => comment
+  click_button 'comment'
 end
 
 Given /^I am editing an existing article$/ do
