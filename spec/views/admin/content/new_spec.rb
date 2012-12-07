@@ -34,4 +34,16 @@ describe "admin/content/new.html.erb" do
     assign(:resources, [])
     render
   end
+
+  it "renders a form for merge" do
+    assign(:images, [])
+    assign(:macros, [])
+    assign(:resources, [])
+    render
+    rendered.should have_selector("form", :method => "post") do |form|
+      form.should have_selector("label", :for => "merge_with", :content => "Article ID")
+      form.should have_selector("input", :type => "text", :name => "merge_with")
+      form.should have_selector("input", :type => "submit", :value => "Merge")
+    end
+  end
 end

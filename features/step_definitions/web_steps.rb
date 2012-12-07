@@ -96,6 +96,13 @@ Given /^I am editing an existing article$/ do
   }
 end
 
+Given /^I edit article "([^"]*)"$/ do |article|
+  steps %Q{
+    Given I am on the admin content page
+    And I follow "#{article}"
+  }
+end
+
 # Single-line step scoper
 When /^(.*) within (.*[^:])$/ do |step, parent|
   with_scope(parent) { When step }
