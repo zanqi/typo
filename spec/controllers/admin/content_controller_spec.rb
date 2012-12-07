@@ -3,6 +3,10 @@
 describe Admin::ContentController do
   render_views
 
+  def mock_article(stubs = {})
+    @articleMock ||= mock_model(Article, stubs).as_null_object
+  end
+
   # Like it's a shared, need call everywhere
   shared_examples_for 'index action' do
 
@@ -607,6 +611,20 @@ describe Admin::ContentController do
       end
     end
 
+    describe 'merge action' do
+      it 'should call merge on the article' do
+        Article.stub(:find).and_return(mock_article)
+        mock_article.should_receive(:merge)
+        post :merge
+      end
+
+      it 'should redirect to index' do
+        Article.stub(:find).and_return(mock_article)
+        post :merge
+        response.should redirect_to(:action => 'index')
+      end
+    end
+
   end
 
   describe 'with publisher connection' do
@@ -669,6 +687,20 @@ describe Admin::ContentController do
         end.should_not change(Article, :count)
       end
 
+    end
+
+    describe 'merge action' do
+      it 'should not call merge on the article' do
+        Article.stub(:find).and_return(mock_article)
+        mock_article.should_not_receive(:merge)
+        post :merge
+      end
+
+      it 'should put an error message in flash' do
+        Article.stub(:find).and_return(mock_article)
+        post :merge
+        flash[:error].should == "Error, you are not allowed to perform this action"
+      end
     end
   end
 end
