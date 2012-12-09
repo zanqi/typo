@@ -618,6 +618,20 @@ describe Admin::ContentController do
         post :merge
       end
 
+      it 'should provide message on successful merge' do
+        Article.stub(:find).and_return(mock_article)
+        mock_article.stub(:merge).and_return(true)
+        post :merge
+        flash[:notice].should == "Merge successfully"
+      end
+
+      it 'should provide message on failed merge' do
+        Article.stub(:find).and_return(mock_article)
+        mock_article.stub(:merge).and_return(false)
+        post :merge
+        flash[:error].should == "Error, merge failed"
+      end
+
       it 'should redirect to index' do
         Article.stub(:find).and_return(mock_article)
         post :merge

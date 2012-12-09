@@ -71,6 +71,22 @@ class Article < Content
     end
   end
 
+  def merge(id)
+    merge_with = Article.find_by_id id
+    return false if merge_with.nil?
+
+    if merge_with.body
+      self.body = self.body + "\n\n" + merge_with.body
+    end
+
+    # merge_with.comments would not work here, not sure why yet
+    target_comments = Comment.find_all_by_article_id(merge_with.id)
+    self.comments << target_comments if target_comments
+
+    self.save
+    merge_with.destroy
+  end
+
   def set_permalink
     return if self.state == 'draft'
     self.permalink = self.title.to_permalink if self.permalink.nil? or self.permalink.empty?
