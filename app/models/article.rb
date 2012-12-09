@@ -83,8 +83,8 @@ class Article < Content
     target_comments = Comment.find_all_by_article_id(merge_with.id)
     self.comments << target_comments if target_comments
 
-    self.save
     merge_with.destroy
+    self.save
   end
 
   def set_permalink

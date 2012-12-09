@@ -68,72 +68,77 @@ describe Article do
   end
 
   describe "#merge" do
-    def mock_article(stubs = {})
+    def build_article(stubs = {})
       Factory(:article, stubs)
     end
 
+    def stub_article_find(return_stub)
+      Article.stub(:find_by_id).and_return(return_stub)
+    end
+
     it "call Article.find_by_id with the given id" do
-      Article.should_receive(:find_by_id).with(3).and_return(mock_article)
-      Factory(:article).merge(3)
+      Article.should_receive(:find_by_id).with(3).and_return(build_article)
+      build_article.merge(3)
     end
 
     it "merge the body of the articles" do
-      Article.stub(:find_by_id).and_return(mock_article(:body => "Bar"))
-      article = Factory(:article, :body => "Foo")
+      stub_article_find(build_article(:body => "Bar"))
+      article = build_article(:body => "Foo")
       article.merge(3)
       article.body.should == "Foo\n\nBar"
     end
 
-    it "merges the comment of the articles" do
-      article = Factory(:article, :id => 1)
-      comment = Factory(:comment, :article => article)
-      other = Factory(:article, :id => 99, :title => "Zzz")
-      other_comment = Factory(:comment, :article => other)
-      Article.stub(:find_by_id).and_return(other)
-      article.merge(99)
+    it "merges the comments of the articles" do
+      article = build_article
+      comment = Factory(:comment, :body => "Foo", :article => article)
+      other = build_article(:title => "Zzz")
+      other_comment = Factory(:comment, :body => "Bar", :article => other)
+      stub_article_find(other)
+      article.merge(3)
       article.comments.count.should == 2
+      article.comments.map(&:body).should include("Foo", "Bar")
     end
 
     it "keeps the title of an article" do
-      Article.stub(:find_by_id).and_return(mock_article(:title => "Aaa"))
-      article = Factory(:article, :title => "Zzz")
+      stub_article_find(build_article(:title => "Aaa"))
+      article = build_article(:title => "Zzz")
       article.merge(3)
       article.title.should == "Zzz"
     end
 
     it "keeps the author of an article" do
-      Article.stub(:find_by_id).and_return(mock_article(:user => Factory(:user)))
+      stub_article_find(build_article(:user => Factory(:user)))
       expected_user = Factory(:user)
-      article = Factory(:article, :user => expected_user)
+      article = build_article(:user => expected_user)
       article.merge(3)
       article.user.should == expected_user
     end
 
     it "calls save on the article" do
-      article = Factory(:article)
-      Article.stub(:find_by_id).and_return(mock_article)
+      article = build_article
+      stub_article_find(build_article)
       article.should_receive(:save)
       article.merge(3)
     end
 
     it "calls destroy on the other article" do
-      article = Factory(:article)
-      other = mock_article
-      Article.stub(:find_by_id).and_return(other)
+      article = build_article
+      other = build_article
+      stub_article_find(other)
       other.should_receive(:destroy)
       article.merge(3)
     end
 
     it "returns false when id is not found" do
-      article = Factory(:article)
-      Article.stub(:find_by_id).and_return(nil)
+      article = build_article
+      stub_article_find(nil)
       article.merge(3).should == false
     end
 
     it "remove the other article from the database" do
-      article = Factory(:article, :title => "Aaa")
-      other = Factory(:article, :title => "Zzz")
-      Article.stub(:find_by_id).and_return(other)
+      article = build_article(:title => "Aaa")
+      other = build_article(:title => "Zzz")
+      stub_article_find(other)
       article.merge(3)
       Article.all.count.should == 1
       Article.first.title.should == "Aaa"

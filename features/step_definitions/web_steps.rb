@@ -41,11 +41,11 @@ Given /^the blog is set up$/ do
                 :profile_id => 1,
                 :name => 'admin',
                 :state => 'active'})
-  User.create!({:login => 'user',
+  User.create!({:login => 'regularuser',
                 :password => 'aaaaaaaa',
                 :email => 'kate@snow.com',
                 :profile_id => 2,
-                :name => 'user',
+                :name => 'regularuser',
                 :state => 'active'})
 end
 
@@ -63,6 +63,18 @@ Given /^I am logged in as "(.*?)"$/ do |user|
   end
 end
 
+Given /^I merge article "([^"]*)" with article "([^"]*)"$/ do |to, from|
+  steps %Q{
+    Given I am on the admin content page
+  }
+  find_link(from)[:href] =~ /(\d+)$/
+  steps %Q{
+    Given I edit article "#{to}"
+    And I fill in "Article ID" with "#{$1}"
+    And I press "Merge"
+  }
+end
+
 Given /^I've published an article "([^"]*)" with body "([^"]*)"$/ do |title, body|
   steps %Q{
     Given I am on the new article page
@@ -72,7 +84,7 @@ Given /^I've published an article "([^"]*)" with body "([^"]*)"$/ do |title, bod
   }
 end
 
-Given /^I am looking at article "([^"]*)"$/ do |article|
+Given /^I am reading article "([^"]*)"$/ do |article|
   steps %Q{
     When I go to the home page
     Then I should see "#{article}"
@@ -82,7 +94,7 @@ end
 
 Given /^I've posted a comment "([^"]*)" on article "([^"]*)"$/ do |comment, article|
   steps %Q{
-    When I am looking at article "#{article}"
+    When I am reading article "#{article}"
   }
   fill_in 'comment_author', :with => 'Reader'
   fill_in 'comment_body', :with => comment
