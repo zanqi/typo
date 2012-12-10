@@ -25,7 +25,8 @@ class Admin::CategoriesController < Admin::BaseController
 
   def new_or_edit
     @categories = Category.find(:all)
-    @category = Category.find(params[:id])
+    # rails 3.2.1 can use first_or_create
+    @category = Category.find_by_id(params[:id]) || Category.new
     @category.attributes = params[:category]
     if request.post?
       respond_to do |format|
