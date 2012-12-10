@@ -34,10 +34,12 @@ Feature: Merge Articles
     And I've published an article "Foo" with body "Lorem Ipsum"
     Then I am logged in as "admin"
     And I've published an article "Bar" with body "Michael Jordan"
-    When I merge article "Bar" with article "Foo"
-    And I should see "admin"
+    And I merge article "Bar" with article "Foo"
+    When I am logged in as "regularuser"
+    And I am on the admin page
+    Then I should see "Your posts: 0"
     # And I should not see "regularuser"
-    # the page has "regularuser" in a drop down, need a more precise step here
+    # the admin content page has "regularuser" in a drop down, need a more precise step here
 
   Scenario: A merged article have the comments of source articles
     Given I am logged in as "admin"
